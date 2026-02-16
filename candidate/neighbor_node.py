@@ -39,12 +39,34 @@ def now_ms() -> int:
 
 def euclidean_dist_to_origin(pos) -> float:
     # TODO: validate pos is [x,y] of numbers; compute distance
-    return 0.0  # TODO
+    if not isinstance(pos, (list, tuple)) or len(pos) != 2:
+        raise ValueError("Position must be a list or tuple of length 2")
+    if not all(isinstance(x, (int, float)) for x in pos):
+        raise ValueError("Position coordinates must be numbers")
+    return math.sqrt(pos[0]**2 + pos[1]**2)
 
 def nearest_neighbor(neighbors: Dict[str, Dict[str, Any]]) -> Optional[Tuple[str, float]]:
     # neighbors[id] -> {"pos":[x,y], "speed": float, "last_ts": int}
     # TODO: iterate neighbors, compute min distance, return (id, dist) or None
-    return None  # TODO
+    if not neighbors:
+        return None
+    
+    nearest_id = None
+    min_dist = float('inf')
+    
+    for neighbor_id, data in neighbors.items():
+        try:
+            dist = euclidean_dist_to_origin(data["pos"])
+            if dist < min_dist:
+                min_dist = dist
+                nearest_id = neighbor_id
+        except (ValueError, KeyError, TypeError):
+            continue
+            
+    if nearest_id is None:
+        return None
+        
+    return (nearest_id, min_dist)
 
 def main() -> int:
     neighbors: Dict[str, Dict[str, Any]] = {}
@@ -71,10 +93,35 @@ def main() -> int:
             #   neighbors[msg["id"]] = {"pos": msg["pos"], "speed": msg["speed"], "last_ts": msg["ts"]}
             #hint: beacon handling, check each message and store in neighbors, try to cover edge cases
             # try to avoid changing anything in the main function outside this TODO block
-
             
+            # Validation
+            if not isinstance(msg, dict):
+                continue
+            
+            required_keys = {"id", "pos", "speed", "ts"}
+            if not required_keys.issubset(msg.keys()):
+                continue
+            
+            if not isinstance(msg["id"], str):
+                continue
+                
+            if not isinstance(msg["pos"], (list, tuple)) or len(msg["pos"]) != 2:
+                continue
+            if not all(isinstance(x, (int, float)) for x in msg["pos"]):
+                continue
 
+            if not isinstance(msg["speed"], (int, float)):
+                continue
 
+            if not isinstance(msg["ts"], int):
+                continue
+            
+            # Store valid message
+            neighbors[msg["id"]] = {
+                "pos": msg["pos"],
+                "speed": msg["speed"], 
+                "last_ts": msg["ts"]
+            }
 
             #END of TODO block
             now = now_ms()
