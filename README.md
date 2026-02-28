@@ -1,5 +1,7 @@
 # WA UDP V2X Challenge
 
+Challenge : https://github.com/exie21/wa-udp-v2x-challenge
+
 ## Overview
 This project implements a simulated V2X (Vehicle-to-Everything) communication node using Python and UDP. The node listens for "beacon" messages from other vehicles, calculates their distance relative to the origin, and identifies the nearest neighbor.
 
